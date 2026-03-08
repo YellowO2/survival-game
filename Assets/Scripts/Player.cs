@@ -32,7 +32,8 @@ public class Player : MonoBehaviour
         if (hitPoints <= 0)
         {
             Debug.Log("Player has died!");
-            // Handle player death (e.g., game over screen, restart, etc.)
+            // Handle player death 
+            GameManager.Instance.ChangeState(GameManager.GameState.GameOver);
         }
     }
 
