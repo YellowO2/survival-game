@@ -2,6 +2,7 @@ using System;
 using UnityEditor;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using UnityEngine.InputSystem;
 //Manages the game state, such as starting and ending the game, keeping track of the score, and handling game over conditions.
 //Currently it keep tracks of total survival time, which influnces strength of the enemies
 // The score is simply the original max hitpoint of enemy defeated, which is added to the score
@@ -12,15 +13,16 @@ public class GameManager : MonoBehaviour
     public GameState currentState { get; private set; }
     //Properties of the game manager
     public float survivalTime = 0f;
-    public int score = 0;
-    public TMPro.TextMeshProUGUI scoreText;
+    public TMPro.TextMeshProUGUI bestTimeText;
+    public TMPro.TextMeshProUGUI surviveTimeText;
     public GameObject gameOverScreen;
     public GameObject inGameMenu;
 
     void Awake()
     {
         print("GameManager Awake Ran");
-        scoreText.text = "Score: " + score;
+        surviveTimeText.text = "Survived: " + survivalTime.ToString("F2") + "s";
+        bestTimeText.text = "Best: " + PlayerPrefs.GetFloat("BestSurvivalTime", 0f).ToString("F2") + "s";
         if (Instance != null && Instance != this)
         {
             print("GameManager Instance already exists, destroying duplicate.");
@@ -30,10 +32,17 @@ public class GameManager : MonoBehaviour
         Instance = this;
     }
 
+    void Start()
+    {
+        print("GameManager Start Ran");
+    }
+
     // Update is called once per frame
     void Update()
     {
         survivalTime += Time.deltaTime;
+        surviveTimeText.text = "Survived: " + survivalTime.ToString("F2") + "s";
+        bestTimeText.text = "Best: " + PlayerPrefs.GetFloat("BestSurvivalTime", 0f).ToString("F2") + "s";
     }
 
 
@@ -47,16 +56,21 @@ public class GameManager : MonoBehaviour
         switch (currentState)
         {
             case GameState.Playing:
-                // Handle playing state (e.g., resume game, enable player controls, etc.)
+                bestTimeText.text = "Best: " + PlayerPrefs.GetFloat("BestSurvivalTime", 0f).ToString("F2") + "s";
                 break;
             case GameState.GameOver:
-                // Handle game over state (e.g., show game over screen, disable player controls, etc.)
+                //save the score to player prefs if higher than the previous score
+                float previousBest = PlayerPrefs.GetFloat("BestSurvivalTime", 0f);
+                if (survivalTime > previousBest)
+                {
+                    PlayerPrefs.SetFloat("BestSurvivalTime", survivalTime);
+                }
                 Time.timeScale = 0f;
+                gameOverScreen.GetComponent<GameOverMenu>().SetUp(survivalTime, PlayerPrefs.GetFloat("BestSurvivalTime", 0f));
                 gameOverScreen.SetActive(true);
 
                 break;
             case GameState.Paused:
-                // Handle paused state (e.g., show pause menu, disable player controls, etc.)
                 Time.timeScale = 0f; // Pause the game
                 break;
         }
@@ -72,11 +86,5 @@ public class GameManager : MonoBehaviour
     {
         Time.timeScale = 1f; // Resume the game
         SceneManager.LoadScene(SceneManager.GetActiveScene().name);
-    }
-
-    public void AddScore(int points)
-    {
-        score += points;
-        scoreText.text = "Score: " + score;
     }
 }

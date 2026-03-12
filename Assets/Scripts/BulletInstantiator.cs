@@ -1,3 +1,5 @@
+using System;
+using NUnit.Framework;
 using UnityEngine;
 //Belongs to the player, responsible for instantiating bullets and setting their properties
 
@@ -5,6 +7,7 @@ public class BulletInstantiator : MonoBehaviour
 {
     // Bullet prefab to instantiate
     public GameObject bulletPrefab;
+    public AimConeIndicator aimConeIndicator;
 
     //Properties of a bullet
     public float speed = 10f;
@@ -14,6 +17,7 @@ public class BulletInstantiator : MonoBehaviour
     public float bulletLifetime = 2f;
 
     private float timeSinceLastShoot = 0f;
+    private bool isCharging = false;
 
 
     void Start()
@@ -32,11 +36,20 @@ public class BulletInstantiator : MonoBehaviour
 
     void Update()
     {
-        //shoot if cooldown is over
-        if (timeSinceLastShoot >= cooldown)
+        //shoot if cooldown is over and if look 
+        if (timeSinceLastShoot >= cooldown && InputManager.Instance.isAttacking && !isCharging)
         {
+            isCharging = true;
+            aimConeIndicator.SetCharging(true);
+            print("start charging");
+        }
+        else if(isCharging && !InputManager.Instance.isAttacking)
+        {
+            print("shoot. Charged for " + timeSinceLastShoot + " seconds.");
             Shoot();
             timeSinceLastShoot = 0f;
+            isCharging = false;
+            aimConeIndicator.SetCharging(false);
         }
         else
         {
