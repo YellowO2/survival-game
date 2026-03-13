@@ -8,22 +8,16 @@ public class BulletInstantiator : MonoBehaviour
     // Bullet prefab to instantiate
     public GameObject bulletPrefab;
     public AimConeIndicator aimConeIndicator;
+    public TMPro.TextMeshPro cooldownText;
 
     //Properties of a bullet
-    public float speed = 10f;
-    public float size = 0.2f;
-    public float damage = 1f;
-    public float cooldown = 0.5f;
-    public float bulletLifetime = 2f;
-
-    private float timeSinceLastShoot = 0f;
+    private float speed = 25f;
+    private float size = 0.2f;
+    private float damage = 1f;
+    private float cooldownTime = 2f;
+    private float cooldownCounter = 0f;
+    private float bulletLifetime = 2f;
     private bool isCharging = false;
-
-
-    void Start()
-    {
-
-    }
 
     void Shoot()
     {
@@ -37,23 +31,29 @@ public class BulletInstantiator : MonoBehaviour
     void Update()
     {
         //shoot if cooldown is over and if look 
-        if (timeSinceLastShoot >= cooldown && InputManager.Instance.isAttacking && !isCharging)
+        if (cooldownCounter <= 0 && InputManager.Instance.isAttacking && !isCharging)
         {
             isCharging = true;
+            Time.timeScale = 0.2f; // Slow down time when attacking
             aimConeIndicator.SetCharging(true);
             print("start charging");
         }
         else if(isCharging && !InputManager.Instance.isAttacking)
         {
-            print("shoot. Charged for " + timeSinceLastShoot + " seconds.");
             Shoot();
-            timeSinceLastShoot = 0f;
             isCharging = false;
             aimConeIndicator.SetCharging(false);
+            cooldownText.text = cooldownTime.ToString("F1") + "s";
+            cooldownCounter = cooldownTime;
+            Time.timeScale = 1f; // Restore normal time scale
         }
         else
         {
-            timeSinceLastShoot += Time.deltaTime;
+            if (cooldownCounter > 0)
+            {
+                cooldownCounter -= Time.deltaTime;
+                cooldownText.text = cooldownCounter.ToString("F1") + "s";
+            }
         }
     }
 }

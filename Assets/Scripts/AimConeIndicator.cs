@@ -6,9 +6,9 @@ public class AimConeIndicator : MonoBehaviour
     public LineRenderer leftLine;
     public LineRenderer rightLine;
 
-    public float chargeDuration = 1.2f;
-    public float startHalfAngle = 35f;
-    public float coneLength = 6f;
+    private float chargeDuration = 0.2f;
+    private float startHalfAngle = 35f;
+    private float coneLength = 6f;
 
     private bool isCharging;
     private float chargeTimer;

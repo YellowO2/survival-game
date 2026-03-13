@@ -7,6 +7,7 @@ public class Bullet : MonoBehaviour
     public float damage = 1f;
     public float lifetime = 2f;
     private int bounceAvailable = 1;
+    private Rigidbody2D rb;
 
     public void SetUp(float damage, float speed, float size, float lifetime)
     {
@@ -14,13 +15,9 @@ public class Bullet : MonoBehaviour
         this.speed = speed;
         this.lifetime = lifetime;
         this.transform.localScale = new Vector3(size, size, size);
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        // Move along the bullet's own forward axis (local up in 2D).
-        transform.Translate(Vector3.up * speed * Time.deltaTime, Space.Self);
+        rb = GetComponent<Rigidbody2D>();
+        rb.collisionDetectionMode = CollisionDetectionMode2D.Continuous; //this is to prevent bullets from passing through thin walls at high speed
+        rb.linearVelocity = transform.up * speed;
     }
 
     // void OnTriggerEnter2D(Collider2D other)
@@ -81,6 +78,7 @@ public class Bullet : MonoBehaviour
             else
             {
                 Destroy(gameObject); // Destroy the bullet if no bounces are left
+
             }
         }
     }

@@ -11,7 +11,7 @@ public class Player : MonoBehaviour
     private Vector2 moveDir;
     public InputActionReference moveAction;
 
-    public int hitPoints = 10;
+    private int hitPoints = 5;
     public TMPro.TextMeshPro hitPointText;
 
 
@@ -27,7 +27,7 @@ public class Player : MonoBehaviour
         if(InputManager.Instance.isAttacking)
         {
             movement = movement * 0.2f; // Reduce speed by half when attacking
-            Time.timeScale = 0.5f; // Slow down time when attacking
+           
         }
         
         rb.linearVelocity = movement;

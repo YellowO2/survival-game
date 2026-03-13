@@ -5,7 +5,7 @@ using UnityEngine;
 public class Enemy : MonoBehaviour
 {
     //Properties of an enemy
-    public float speed = 1f;
+    private float speed;
     public int hitpoints = 1; // the enemy size scales with hitpoints, the bigger the hitpoints, the bigger the enemy
     // text mesh pro to display hitpoints
     public int originalHitpoints; // the original hitpoints of the enemy, which is used to calculate score when the enemy is defeated
@@ -26,8 +26,8 @@ public class Enemy : MonoBehaviour
         this.originalHitpoints = hitpoints;
         hitpointsText.text = hitpoints.ToString();
         // scale the enemy with hitpoints
-        size = Mathf.Pow(hitpoints,0.3f)*0.6f; // Adjust the exponent and multiplier to get the desired scaling effect
-        transform.localScale = new Vector3(size, size, 1);
+        size = hitpoints*0.5f; // Adjust the exponent and multiplier to get the desired scaling effect
+        transform.localScale = new Vector3(Mathf.Sqrt(size), Mathf.Sqrt(size), 1);
         rb = GetComponent<Rigidbody2D>();
         InitialiseMovment();
     }
@@ -42,8 +42,8 @@ public class Enemy : MonoBehaviour
     {
         hitpoints -= damage;
         hitpointsText.text = hitpoints.ToString();
-        size = Mathf.Pow(hitpoints,0.3f)*0.6f;
-        transform.localScale = new Vector3(size, size, 1);
+        size = hitpoints * 0.5f;
+        transform.localScale = new Vector3(Mathf.Sqrt(size), Mathf.Sqrt(size), 1);
         if (hitpoints <= 0)
         {
             Destroy(gameObject);
