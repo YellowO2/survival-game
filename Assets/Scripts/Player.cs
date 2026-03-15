@@ -4,10 +4,9 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 
-public class Player : MonoBehaviour
+public class Player : BaseBall
 {
     public float speed = 5f;
-    Rigidbody2D rb;
     private Vector2 moveDir;
     public InputActionReference moveAction;
 
@@ -17,7 +16,6 @@ public class Player : MonoBehaviour
 
     void Start()
     {
-        rb = GetComponent<Rigidbody2D>();
         hitPointText.text = hitPoints.ToString();
     }
 

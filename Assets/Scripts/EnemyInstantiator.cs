@@ -7,7 +7,6 @@ public class EnemyInstantiator : MonoBehaviour
     // Enemy prefab to instantiate
     public GameObject enemyPrefab;
     public float spawnRate = 3f;
-    private float timeSinceLastSpawn = 0f;
     private float baseEnemySpeed = 0f;
     private float enemySpeedIncreaseRate = 0.5f; // Increase enemy speed by 0.1 every 5 seconds
 
@@ -15,27 +14,23 @@ public class EnemyInstantiator : MonoBehaviour
     {
         // Optionally, you can initialize any necessary variables or settings here
     }
-
-    // Update is called once per frame
-    void Update()
-    {
-        timeSinceLastSpawn += Time.deltaTime;
-        if (timeSinceLastSpawn >= spawnRate)
-        {
-            GenerateEnemy();
-            timeSinceLastSpawn = 0f;
-        }
-    }
-
     private int GenerateEnemyHitpoints()
     {
         // Generate hitpoints based on survival time
         float survivalTime = GameManager.Instance.survivalTime;
-        int hitpoints =  Random.Range(1, 3); // Increase hitpoints every 10 seconds Mathf.FloorToInt(survivalTime / 20f) +
+        int hitpoints =  Random.Range(1, 5 + Mathf.FloorToInt(survivalTime / 10f)); // Increase hitpoints every 10 seconds
         return hitpoints;
     }
 
-    private void GenerateEnemy()
+    public void GenerateMultipleEnemies(int count)
+    {
+        for (int i = 0; i < count; i++)
+        {
+            GenerateEnemy();
+        }
+    }
+
+    public void GenerateEnemy()
     {
         float width = 8f;
         float halfWidth = width / 2f;
