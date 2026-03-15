@@ -12,16 +12,13 @@ public class GameManager : MonoBehaviour
     public enum GameState { Playing, GameOver, Paused }
     public GameState currentState { get; private set; }
     //Properties of the game manager
-    public float survivalTime = 0f;
     public TMPro.TextMeshProUGUI bestTimeText;
-    public TMPro.TextMeshProUGUI surviveTimeText;
     public GameObject gameOverScreen;
     public GameObject inGameMenu;
 
     void Awake()
     {
         print("GameManager Awake Ran");
-        surviveTimeText.text = "Survived: " + survivalTime.ToString("F2") + "s";
         bestTimeText.text = "Best: " + PlayerPrefs.GetFloat("BestSurvivalTime", 0f).ToString("F2") + "s";
         if (Instance != null && Instance != this)
         {
@@ -40,8 +37,6 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        survivalTime += Time.deltaTime;
-        surviveTimeText.text = "Survived: " + survivalTime.ToString("F2") + "s";
         bestTimeText.text = "Best: " + PlayerPrefs.GetFloat("BestSurvivalTime", 0f).ToString("F2") + "s";
     }
 
@@ -61,12 +56,8 @@ public class GameManager : MonoBehaviour
             case GameState.GameOver:
                 //save the score to player prefs if higher than the previous score
                 float previousBest = PlayerPrefs.GetFloat("BestSurvivalTime", 0f);
-                if (survivalTime > previousBest)
-                {
-                    PlayerPrefs.SetFloat("BestSurvivalTime", survivalTime);
-                }
                 Time.timeScale = 0f;
-                gameOverScreen.GetComponent<GameOverMenu>().SetUp(survivalTime, PlayerPrefs.GetFloat("BestSurvivalTime", 0f));
+                gameOverScreen.GetComponent<GameOverMenu>().SetUp(69, PlayerPrefs.GetFloat("BestSurvivalTime", 0f));
                 gameOverScreen.SetActive(true);
 
                 break;

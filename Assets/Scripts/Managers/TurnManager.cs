@@ -1,5 +1,6 @@
-using Unity.VisualScripting;
+using System.Collections;
 using UnityEngine;
+
 
 public enum TurnPhase { Spawn, PlayerAim, WaitPhysicsSettle, Resolving }
 public class TurnManager : MonoBehaviour
@@ -7,8 +8,9 @@ public class TurnManager : MonoBehaviour
     public static TurnManager Instance { get; private set; }
     public EnemyInstantiator enemyInstantiator;
     public TurnPhase phase { get; private set; }
-    int turnIndex = 0;
-    bool shotTaken = false;
+    private int maxEnemiesAllowed = 5;
+    public TMPro.TextMeshProUGUI enemiesCountText; //lets just use this for the turn count as well.
+    public int turnCount { get; private set; } = 0;
 
 
     void Awake()
@@ -27,24 +29,77 @@ public class TurnManager : MonoBehaviour
 
     void StartTurn()
     {
-        turnIndex++;
-        shotTaken = false;
+        turnCount++;
         phase = TurnPhase.Spawn;
-        enemyInstantiator.GenerateMultipleEnemies(3);
+        enemyInstantiator.GenerateMultipleEnemies(2);
+        string turnText = "Turn: " + turnCount;
+        enemiesCountText.text = "Enemies: " + FindObjectsByType<Enemy>(FindObjectsSortMode.None).Length + "/" + maxEnemiesAllowed + "\n" + turnText;
         phase = TurnPhase.PlayerAim;
     }
     public void OnShotFired()
     {
         if (phase != TurnPhase.PlayerAim) return;
-        shotTaken = true;
         phase = TurnPhase.WaitPhysicsSettle;
+        StartCoroutine(WaitForPhysicsToSettle());
     }
     public void OnPhysicsSettled()
     {
         if (phase != TurnPhase.WaitPhysicsSettle) return;
         phase = TurnPhase.Resolving;
-       
+        StartCoroutine(ResolvePhaseRoutine());
     }
 
-    
+    private IEnumerator ResolvePhaseRoutine()
+    {
+        Enemy[] allEnemies = FindObjectsByType<Enemy>(FindObjectsSortMode.None);
+        
+        foreach (Enemy enemy in allEnemies)
+        {
+            if (enemy != null && enemy.hitpoints <= 0)
+            {
+                Destroy(enemy.gameObject);
+            }
+        }
+
+        yield return new WaitForEndOfFrame(); // this is because enemies take one frame to be destroyed so we need to wait.
+
+        Enemy[] remainingEnemies = FindObjectsByType<Enemy>(FindObjectsSortMode.None);
+        string turnText = "Turn: " + turnCount;
+        enemiesCountText.text = "Enemies: " + remainingEnemies.Length + "/" + maxEnemiesAllowed + "\n" + turnText;
+        
+        if (remainingEnemies.Length > maxEnemiesAllowed)
+        {
+            GameManager.Instance.ChangeState(GameManager.GameState.GameOver);
+        }
+        else
+        {
+            StartTurn();
+        }
+    }
+
+    private IEnumerator WaitForPhysicsToSettle()
+    {
+        yield return new WaitForSeconds(1f);
+
+        // Find all balls currently in the game
+        BaseBall[] allBalls = FindObjectsByType<BaseBall>(FindObjectsSortMode.None);
+        bool isSettled = false;
+
+        while (!isSettled)
+        {
+            isSettled = true;
+            foreach (BaseBall ball in allBalls)
+            {
+                if (ball.IsMoving())
+                {
+                    isSettled = false;
+                    break; // No need to check the rest this frame
+                }
+            }
+            yield return null;
+        }
+        OnPhysicsSettled();
+    }
+
+
 }

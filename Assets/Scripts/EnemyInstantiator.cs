@@ -1,24 +1,20 @@
-using System.Numerics;
-using Unity.VisualScripting;
+
 using UnityEngine;
 //Controls where and when to spawn enemies, as well as the strength of the enemies based on the player's survival time. The spawn rate and enemy strength can be adjusted to create a challenging gameplay experience that scales with the player's progress.
 public class EnemyInstantiator : MonoBehaviour
 {
     // Enemy prefab to instantiate
     public GameObject enemyPrefab;
-    public float spawnRate = 3f;
-    private float baseEnemySpeed = 0f;
-    private float enemySpeedIncreaseRate = 0.5f; // Increase enemy speed by 0.1 every 5 seconds
-
-     void Start()
+    private int maxAttempts = 15; // Maximum attempts to find a valid spawn position
+    float spawnAreaLength = 10f; //length of each side of the square spawn area
+    float enemyRadius = 1;
+    void Start()
     {
         // Optionally, you can initialize any necessary variables or settings here
     }
     private int GenerateEnemyHitpoints()
     {
-        // Generate hitpoints based on survival time
-        float survivalTime = GameManager.Instance.survivalTime;
-        int hitpoints =  Random.Range(1, 5 + Mathf.FloorToInt(survivalTime / 10f)); // Increase hitpoints every 10 seconds
+        int hitpoints = Random.Range(1, 3 + Mathf.FloorToInt(TurnManager.Instance.turnCount / 5)); // Increase max hitpoints every 5 turns
         return hitpoints;
     }
 
@@ -36,39 +32,44 @@ public class EnemyInstantiator : MonoBehaviour
         float halfWidth = width / 2f;
 
         // Randomly select one of the four edges (0=top, 1=bottom, 2=left, 3=right)
-        int edge = Random.Range(0, 4);
-        UnityEngine.Vector3 spawnPosition;
+        int colorIndex = Random.Range(0, 4);
+        UnityEngine.Vector3 spawnPosition = GetSpawnPosition(enemyRadius);
 
-        switch (edge)
+        Enemy enemy = Instantiate(enemyPrefab, spawnPosition, Quaternion.identity).GetComponent<Enemy>();
+        enemy.SetUp(GenerateEnemyHitpoints(), ColorFromIndex(colorIndex));
+    }
+    private static readonly BallColor[] AllColors =
+        (BallColor[])System.Enum.GetValues(typeof(BallColor));
+
+    public static BallColor ColorFromIndex(int index)
+    {
+        // Wrap index so any int works (negative/large)
+        int safeIndex = ((index % AllColors.Length) + AllColors.Length) % AllColors.Length;
+        return AllColors[safeIndex];
+    }
+
+    public Vector3 GetSpawnPosition(float enemyRadius)
+    {
+        float halfLength = spawnAreaLength / 2f;
+        for (int i = 0; i < maxAttempts; i++)
         {
-            case 0: // Top edge
-                spawnPosition = new UnityEngine.Vector3(
-                    Random.Range(-halfWidth, halfWidth),
-                    halfWidth,
-                    0f);
-                break;
-            case 1: // Bottom edge
-                spawnPosition = new UnityEngine.Vector3(
-                    Random.Range(-halfWidth, halfWidth),
-                    -halfWidth,
-                    0f);
-                break;
-            case 2: // Left edge
-                spawnPosition = new UnityEngine.Vector3(
-                    -halfWidth,
-                    Random.Range(-halfWidth, halfWidth),
-                    0f);
-                break;
-            default: // Right edge
-                spawnPosition = new UnityEngine.Vector3(
-                    halfWidth,
-                    Random.Range(-halfWidth, halfWidth),
-                    0f);
-                break;
+            // pick random spot
+            float randomX = Random.Range(-halfLength, halfLength);
+            float randomY = Random.Range(-halfLength, halfLength);
+            Vector2 potentialPoint = new Vector2(randomX, randomY);
+
+            // check if nothing will collide if spawned there
+            Collider2D overlappingCollider = Physics2D.OverlapCircle(potentialPoint, enemyRadius);
+
+            if (overlappingCollider == null)
+            {
+                // We found an empty spot!
+                return potentialPoint;
+            }
         }
 
-        Enemy enemy = Instantiate(enemyPrefab, spawnPosition, UnityEngine.Quaternion.identity).GetComponent<Enemy>();
-        enemy.SetUp(GenerateEnemyHitpoints(), baseEnemySpeed + enemySpeedIncreaseRate * (GameManager.Instance.survivalTime / 5f)); // Increase speed every 5 seconds
+        print("Failed to find a valid spawn position after " + maxAttempts + " attempts.");
+        return Vector2.zero;
     }
 
     // private void generateNewSpawnRate()

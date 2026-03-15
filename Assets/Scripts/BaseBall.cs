@@ -9,8 +9,9 @@ public abstract class BaseBall : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
     }
 
+    // A handy method for your TurnManager to check if this specific ball has stopped
     public bool IsMoving()
     {
-        return rb.linearVelocity.sqrMagnitude > 0.001f || Mathf.Abs(rb.angularVelocity) > 0.1f;
+        return rb.linearVelocity.sqrMagnitude > 0.01f;
     }
 }

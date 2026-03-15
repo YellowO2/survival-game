@@ -4,58 +4,19 @@ using UnityEngine.EventSystems;
 using UnityEngine.InputSystem;
 
 
-public class Player : BaseBall
+public class PlayerBall : BaseBall
 {
-    public float speed = 5f;
-    private Vector2 moveDir;
-    public InputActionReference moveAction;
-
-    private int hitPoints = 5;
+    public float speed {get; private set;} = 10f;
     public TMPro.TextMeshPro hitPointText;
 
 
     void Start()
     {
-        hitPointText.text = hitPoints.ToString();
-    }
-
-    void Move()
-    {
-        Vector2 movement = moveDir * speed;
-        if(InputManager.Instance.isAttacking)
-        {
-            movement = movement * 0.2f; // Reduce speed by half when attacking
-           
-        }
-        
-        rb.linearVelocity = movement;
-
-        transform.up = InputManager.Instance.aimDirection.normalized;
-
-    }
-
-    public void TakeDamage(int damage)
-    {
-        // Handle player taking damage here (e.g., reduce health, check for game over, etc.)
-        hitPoints -= damage;
-        hitPointText.text = hitPoints.ToString();
-        if (hitPoints <= 0)
-        {
-            Debug.Log("Player has died!");
-            // Handle player death and hide the player object
-            gameObject.SetActive(false);
-            GameManager.Instance.ChangeState(GameManager.GameState.GameOver);
-        }
     }
 
     void Update()
     {
-        moveDir = moveAction.action.ReadValue<Vector2>();
-    }
-
-    void FixedUpdate()
-    {
-        Move();
+        transform.up = InputManager.Instance.aimDirection.normalized;
     }
 
     void OnTriggerEnter2D(Collider2D other)
@@ -63,9 +24,9 @@ public class Player : BaseBall
         if (other.gameObject.CompareTag("Enemy"))
         {
             print("Player collided with enemy!");
-            Enemy enemy = other.GetComponent<Enemy>();
-            TakeDamage(enemy.hitpoints);
-            Destroy(other.gameObject);
+            // Enemy enemy = other.GetComponent<Enemy>();
+            // TakeDamage(enemy.hitpoints);
+            // Destroy(other.gameObject);
         }
     }
 

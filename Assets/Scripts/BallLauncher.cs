@@ -2,18 +2,11 @@ using System;
 using UnityEngine;
 //Belongs to the player, responsible for instantiating bullets and setting their properties
 
-public class BulletInstantiator : MonoBehaviour
+public class BallLauncher : MonoBehaviour
 {
-    // Bullet prefab to instantiate
-    public GameObject bulletPrefab;
     public AimConeIndicator aimConeIndicator;
     public TMPro.TextMeshPro cooldownText;
-
-    //Properties of a bullet
-    private float speed = 10f;
-    private float size = 1f;
-    private float damage = 1f;
-    private float bulletLifetime = 2f;
+    public PlayerBall playerBall;
     private bool isAiming = false;
 
     void Shoot()
@@ -22,12 +15,7 @@ public class BulletInstantiator : MonoBehaviour
         {
             return;
         }
-
-        //Instantiate a bullet and set its properties
-        GameObject bullet = Instantiate(bulletPrefab, transform.position + transform.up * 0.5f, transform.rotation);
-        Bullet bulletScript = bullet.GetComponent<Bullet>();
-        bulletScript.SetUp(damage, speed, size, bulletLifetime);
-        Destroy(bullet, bulletLifetime);
+        playerBall.rb.AddForce(transform.up * playerBall.speed, ForceMode2D.Impulse);
         TurnManager.Instance.OnShotFired();
     }
 

@@ -10,7 +10,7 @@ public class DamageZone : MonoBehaviour
             Enemy enemy = collision.gameObject.GetComponent<Enemy>();
             int damage = enemy.hitpoints;
 
-            Player player = GameObject.FindGameObjectWithTag("Player").GetComponent<Player>();
+            PlayerBall player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerBall>();
             // player.TakeDamage(damage);
 
             //Destroy the enemy that entered the damage zone
