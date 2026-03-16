@@ -1,5 +1,5 @@
 using UnityEngine;
-
+//TODO : this is useless current, consider cleaning up later.
 public class ScoreManager : MonoBehaviour
 {
     public TMPro.TextMeshProUGUI scoreText;

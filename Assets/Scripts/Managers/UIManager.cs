@@ -9,6 +9,7 @@ public class UIManager : MonoBehaviour
     public TextMeshProUGUI hitPointText;
     public TextMeshProUGUI bestTimeText;
     public TextMeshProUGUI enemiesCountText;
+    public TextMeshProUGUI scoreText;
 
     [Header("Menus")]
     public GameOverMenu gameOverScreen;
@@ -22,6 +23,14 @@ public class UIManager : MonoBehaviour
             return;
         }
         Instance = this;
+    }
+
+    void Start()
+    {
+        UpdatePlayerHealth(3); // Assuming player starts with 3 health
+        UpdateBestTime(0); // Assuming no best time at start
+        UpdateTurnAndEnemyCount(0, 5, 0); // Assuming starting with 0 enemies and 0 turn
+        UpdateScore(0); // Assuming starting with 0 score
     }
 
     public void UpdatePlayerHealth(int currentHealth)
@@ -46,6 +55,14 @@ public class UIManager : MonoBehaviour
         if (enemiesCountText != null)
         {
             enemiesCountText.text = "Enemies: " + enemyCount + "/" + maxEnemies + "\nTurn: " + turn;
+        }
+    }
+
+    public void UpdateScore(int newScore)
+    {
+        if (scoreText != null)
+        {
+            scoreText.text = "Score: " + newScore.ToString();
         }
     }
 

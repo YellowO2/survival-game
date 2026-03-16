@@ -10,6 +10,8 @@ public class TurnManager : MonoBehaviour
     public TurnPhase phase { get; private set; }
     private int maxEnemiesAllowed = 5;
     public int turnCount { get; private set; } = 0;
+    public int turnDamage { get; private set; } = 0;
+    public int totalScore { get; private set; } = 0;
 
 
     void Awake()
@@ -29,10 +31,12 @@ public class TurnManager : MonoBehaviour
     void StartTurn()
     {
         turnCount++;
+        turnDamage = 0; // Reset turn damage for the new turn
         phase = TurnPhase.Spawn;
         enemyInstantiator.GenerateMultipleEnemies(2);
         int currentEnemies = FindObjectsByType<EnemyBall>(FindObjectsSortMode.None).Length;
         UIManager.Instance.UpdateTurnAndEnemyCount(currentEnemies, maxEnemiesAllowed, turnCount);
+        UIManager.Instance.UpdateScore(totalScore);
         phase = TurnPhase.PlayerAim;
     }
     public void OnShotFired()
@@ -41,6 +45,18 @@ public class TurnManager : MonoBehaviour
         phase = TurnPhase.WaitPhysicsSettle;
         StartCoroutine(WaitForPhysicsToSettle());
     }
+
+    public void RecordDamage(int amount)
+    {
+            turnDamage += amount;
+            totalScore += amount;
+            
+            if (UIManager.Instance != null)
+            {
+                UIManager.Instance.UpdateScore(totalScore);
+            }
+    }
+
     public void OnPhysicsSettled()
     {
         Debug.Log("Physics settled, starting resolve phase.");

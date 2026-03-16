@@ -2,13 +2,13 @@ using UnityEditor.Callbacks;
 using UnityEngine;
 
 public enum BallColor { Red, Blue, Green }
-public enum BallType { Normal, Bomb, Spike } 
+public enum BallType { Normal, Bomb, Spike }
 
 
 public class EnemyBall : BaseBall
 {
     //Properties of an enemy
-    public int hitpoints{ get; private set; } = 1 ;
+    public int hitpoints { get; private set; } = 1;
     public BallColor color { get; private set; }
     public BallType type { get; private set; }
     public TMPro.TextMeshPro hitpointsText;
@@ -50,6 +50,7 @@ public class EnemyBall : BaseBall
     {
         hitpoints -= damage;
         hitpointsText.text = hitpoints.ToString();
+        TurnManager.Instance.RecordDamage(damage);
     }
 
     public virtual void Die() //only for calling during the resolve phase
