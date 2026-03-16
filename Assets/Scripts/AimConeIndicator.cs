@@ -5,7 +5,7 @@ public class AimConeIndicator : MonoBehaviour
     public Transform origin;
     public LineRenderer leftLine;
 
-    public float aimLength = 8f;
+    public float maxAimLength = 8f;
     public LayerMask collisionMask = ~0;
 
     private bool isCharging;
@@ -29,36 +29,42 @@ public class AimConeIndicator : MonoBehaviour
         aim.Normalize();
 
         Vector3 start = origin.position;
-        Vector3 end = start + (Vector3)(aim * aimLength);
+        Vector3 end = start + (Vector3)(aim * maxAimLength);
 
-        // Stop the line at first collision so aiming feels more like a pool guideline.
-        RaycastHit2D hit = Physics2D.Raycast(start, aim, aimLength, collisionMask);
-        if (hit.collider != null)
+        RaycastHit2D hit = Physics2D.CircleCast(start, 0.5f, aim, maxAimLength, collisionMask); //perhaps should have a constant term for radius instead of 1
+
+        if (hit.collider != null) //if hit something
         {
-            end = hit.point;
+            end = hit.centroid;
         }
 
         leftLine.positionCount = 2;
         leftLine.SetPosition(0, start);
         leftLine.SetPosition(1, end);
-        //now lets draw the reflected line if we hit something
-        if (hit.collider != null)
+
+        //now lets draw the reflected line
+        //the reflection is different for collision with ball vs collision with static wall
+        if (hit.collider != null && !hit.collider.CompareTag("Enemy")) //if hit wall
         {
-            Vector2 incomingVec = end - start;
-            Vector2 normalVec = hit.normal;
-            Vector2 reflectedVec = Vector2.Reflect(incomingVec, normalVec).normalized;
+            Vector2 reflectedDir = Vector2.Reflect(aim, hit.normal).normalized;
+            Vector2 reflectedEnd = hit.centroid + (Vector2)(reflectedDir * maxAimLength);
 
-            Vector2 reflectedEnd = hit.point + (Vector2)(reflectedVec * aimLength);
-
-            // Check for collisions along the reflected path
-            RaycastHit2D reflectedHit = Physics2D.Raycast(hit.point, reflectedVec, aimLength, collisionMask);
+            // // Check for collisions along the reflected path
+            RaycastHit2D reflectedHit = Physics2D.CircleCast(hit.point, 0.5f, reflectedDir, maxAimLength, collisionMask);
             if (reflectedHit.collider != null)
             {
-                reflectedEnd = reflectedHit.point;
+                reflectedEnd = reflectedHit.centroid;
             }
 
             // Draw the reflected line
             leftLine.positionCount = 3; // We need 3 points to draw the original and reflected lines
+            leftLine.SetPosition(2, reflectedEnd);
+        }else if (hit.collider != null && hit.collider.CompareTag("Enemy")) //if hit enemy, which is a ball
+        {
+            // enemy reflects 90 degrees to the line connecting centers of the enemy.
+            Vector2 reflectedDir = Vector2.Perpendicular(hit.centroid - (Vector2)origin.position).normalized;
+            Vector2 reflectedEnd = hit.centroid + (Vector2)(reflectedDir * maxAimLength);
+            leftLine.positionCount = 3;
             leftLine.SetPosition(2, reflectedEnd);
         }
     }

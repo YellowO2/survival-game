@@ -7,7 +7,7 @@ public class DamageZone : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Enemy"))
         {
-            Enemy enemy = collision.gameObject.GetComponent<Enemy>();
+            EnemyBall enemy = collision.gameObject.GetComponent<EnemyBall>();
             int damage = enemy.hitpoints;
 
             PlayerBall player = GameObject.FindGameObjectWithTag("Player").GetComponent<PlayerBall>();

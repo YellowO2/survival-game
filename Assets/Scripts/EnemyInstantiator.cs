@@ -4,14 +4,13 @@ using UnityEngine;
 public class EnemyInstantiator : MonoBehaviour
 {
     // Enemy prefab to instantiate
+    [Header("Prefabs")]
     public GameObject enemyPrefab;
+    public GameObject bombPrefab;
     private int maxAttempts = 15; // Maximum attempts to find a valid spawn position
     float spawnAreaLength = 10f; //length of each side of the square spawn area
     float enemyRadius = 1;
-    void Start()
-    {
-        // Optionally, you can initialize any necessary variables or settings here
-    }
+
     private int GenerateEnemyHitpoints()
     {
         int hitpoints = Random.Range(1, 3 + Mathf.FloorToInt(TurnManager.Instance.turnCount / 5)); // Increase max hitpoints every 5 turns
@@ -28,14 +27,16 @@ public class EnemyInstantiator : MonoBehaviour
 
     public void GenerateEnemy()
     {
-        float width = 8f;
-        float halfWidth = width / 2f;
-
-        // Randomly select one of the four edges (0=top, 1=bottom, 2=left, 3=right)
         int colorIndex = Random.Range(0, 4);
         UnityEngine.Vector3 spawnPosition = GetSpawnPosition(enemyRadius);
 
-        Enemy enemy = Instantiate(enemyPrefab, spawnPosition, Quaternion.identity).GetComponent<Enemy>();
+        // Decide which prefab to spawn based on probability
+        GameObject prefabToSpawn = enemyPrefab;
+        if (Random.value <= 0.2 && bombPrefab != null)
+        {
+            prefabToSpawn = bombPrefab;
+        }
+        EnemyBall enemy = Instantiate(prefabToSpawn, spawnPosition, Quaternion.identity).GetComponent<EnemyBall>();
         enemy.SetUp(GenerateEnemyHitpoints(), ColorFromIndex(colorIndex));
     }
     private static readonly BallColor[] AllColors =
@@ -59,7 +60,7 @@ public class EnemyInstantiator : MonoBehaviour
             Vector2 potentialPoint = new Vector2(randomX, randomY);
 
             // check if nothing will collide if spawned there
-            Collider2D overlappingCollider = Physics2D.OverlapCircle(potentialPoint, enemyRadius);
+            Collider2D overlappingCollider = Physics2D.OverlapCircle(potentialPoint, enemyRadius + 0.4f); //add abit more radius as buffer
 
             if (overlappingCollider == null)
             {
@@ -71,11 +72,4 @@ public class EnemyInstantiator : MonoBehaviour
         print("Failed to find a valid spawn position after " + maxAttempts + " attempts.");
         return Vector2.zero;
     }
-
-    // private void generateNewSpawnRate()
-    // {
-    //     // Decrease spawn rate based on survival time
-    //     float survivalTime = GameManager.Instance.survivalTime;
-    //     spawnRate = Mathf.Max(0.1f, 1f - survivalTime / 60f); // Decrease spawn rate every 60 seconds, with a minimum of 0.1 seconds
-    // }
 }

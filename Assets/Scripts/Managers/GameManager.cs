@@ -19,7 +19,7 @@ public class GameManager : MonoBehaviour
     void Awake()
     {
         print("GameManager Awake Ran");
-        bestTimeText.text = "Best: " + PlayerPrefs.GetFloat("BestSurvivalTime", 0f).ToString("F2") + "s";
+        bestTimeText.text = "Best: " + PlayerPrefs.GetInt("BestTurn", 0).ToString("F2") + "s";
         if (Instance != null && Instance != this)
         {
             print("GameManager Instance already exists, destroying duplicate.");
@@ -37,7 +37,7 @@ public class GameManager : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        bestTimeText.text = "Best: " + PlayerPrefs.GetFloat("BestSurvivalTime", 0f).ToString("F2") + "s";
+        bestTimeText.text = "Best: " + PlayerPrefs.GetInt("BestTurn", 0).ToString("F2") + "s";
     }
 
 
@@ -51,13 +51,17 @@ public class GameManager : MonoBehaviour
         switch (currentState)
         {
             case GameState.Playing:
-                bestTimeText.text = "Best: " + PlayerPrefs.GetFloat("BestSurvivalTime", 0f).ToString("F2") + "s";
+                bestTimeText.text = "Best: " + PlayerPrefs.GetInt("BestTurn", 0).ToString("F2") + "s";
                 break;
             case GameState.GameOver:
                 //save the score to player prefs if higher than the previous score
-                float previousBest = PlayerPrefs.GetFloat("BestSurvivalTime", 0f);
+                int previousBest = PlayerPrefs.GetInt("BestTurn", 0);
+                if (TurnManager.Instance.turnCount > previousBest)
+                {
+                    PlayerPrefs.SetInt("BestTurn", TurnManager.Instance.turnCount);
+                }
                 Time.timeScale = 0f;
-                gameOverScreen.GetComponent<GameOverMenu>().SetUp(69, PlayerPrefs.GetFloat("BestSurvivalTime", 0f));
+                gameOverScreen.GetComponent<GameOverMenu>().SetUp(TurnManager.Instance.turnCount, PlayerPrefs.GetInt("BestTurn", 0));
                 gameOverScreen.SetActive(true);
 
                 break;

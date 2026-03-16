@@ -55,7 +55,7 @@ public class Bullet : MonoBehaviour
         {
             print("Bullet collided with enemy!");
             // Handle damage to the enemy here
-            Enemy enemy = collision.gameObject.GetComponent<Enemy>();
+            EnemyBall enemy = collision.gameObject.GetComponent<EnemyBall>();
             if (enemy != null)
             {
                 enemy.TakeDamage((int)damage);

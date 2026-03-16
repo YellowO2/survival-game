@@ -131,7 +131,7 @@ GameObject:
   - component: {fileID: 30023885}
   - component: {fileID: 30023884}
   m_Layer: 5
-  m_Name: BestTimeText
+  m_Name: TopText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -451,7 +451,7 @@ GameObject:
   - component: {fileID: 427931291}
   - component: {fileID: 427931290}
   m_Layer: 5
-  m_Name: SurviveTimeText
+  m_Name: BottomText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -2589,7 +2589,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::AimConeIndicator
   origin: {fileID: 1462797462}
   leftLine: {fileID: 884689608}
-  aimLength: 8
+  maxAimLength: 8
   collisionMask:
     serializedVersion: 2
     m_Bits: 55
@@ -2738,8 +2738,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameOverMenu
   restartButton: {fileID: 784787414}
-  finalTimeText: {fileID: 427931290}
-  bestTimeText: {fileID: 30023884}
+  BestText: {fileID: 30023884}
+  CurrentText: {fileID: 427931290}
 --- !u!1 &1602650074
 GameObject:
   m_ObjectHideFlags: 0
@@ -3050,9 +3050,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a14f5cf8042504653ad2f0f73cfff3e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
-  survivalTime: 0
   bestTimeText: {fileID: 87095805}
-  surviveTimeText: {fileID: 0}
   gameOverScreen: {fileID: 1502047790}
   inGameMenu: {fileID: 1635185271}
 --- !u!1 &1760852578
@@ -3445,6 +3443,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::EnemyInstantiator
   enemyPrefab: {fileID: 8753799142762896369, guid: 1722dce0d469e414b81bdf0f357c77c2, type: 3}
+  bombPrefab: {fileID: 8753799142762896369, guid: 6322ee9f5719de54197d2d0934906e4e, type: 3}
 --- !u!1 &2042300712
 GameObject:
   m_ObjectHideFlags: 0

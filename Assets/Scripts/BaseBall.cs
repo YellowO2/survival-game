@@ -10,7 +10,7 @@ public abstract class BaseBall : MonoBehaviour
     }
 
     // A handy method for your TurnManager to check if this specific ball has stopped
-    public bool IsMoving()
+    public virtual bool IsBusy()
     {
         return rb.linearVelocity.sqrMagnitude > 0.01f;
     }

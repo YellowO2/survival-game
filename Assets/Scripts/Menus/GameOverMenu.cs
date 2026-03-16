@@ -5,8 +5,8 @@ using UnityEngine.UI;
 public class GameOverMenu : MonoBehaviour
 {
     public Button restartButton;
-    public TextMeshProUGUI finalTimeText;
-    public TextMeshProUGUI bestTimeText;
+    public TextMeshProUGUI BestText;
+    public TextMeshProUGUI CurrentText;
     
     void Start()
     {
@@ -18,9 +18,8 @@ public class GameOverMenu : MonoBehaviour
         GameManager.Instance.RestartGame();
     }
 
-    public void SetUp(float finalTime, float bestTime)
+    public void SetUp(int survivedTurns, int bestTurns)
     {
-        finalTimeText.text = "Final: " + finalTime.ToString("F2") + "s";
-        bestTimeText.text = "Best: " + bestTime.ToString("F2") + "s";
+        CurrentText.text = "You Survived " + survivedTurns + " Turns!";
     }
 }

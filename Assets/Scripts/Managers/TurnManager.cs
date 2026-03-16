@@ -33,7 +33,7 @@ public class TurnManager : MonoBehaviour
         phase = TurnPhase.Spawn;
         enemyInstantiator.GenerateMultipleEnemies(2);
         string turnText = "Turn: " + turnCount;
-        enemiesCountText.text = "Enemies: " + FindObjectsByType<Enemy>(FindObjectsSortMode.None).Length + "/" + maxEnemiesAllowed + "\n" + turnText;
+        enemiesCountText.text = "Enemies: " + FindObjectsByType<EnemyBall>(FindObjectsSortMode.None).Length + "/" + maxEnemiesAllowed + "\n" + turnText;
         phase = TurnPhase.PlayerAim;
     }
     public void OnShotFired()
@@ -51,19 +51,19 @@ public class TurnManager : MonoBehaviour
 
     private IEnumerator ResolvePhaseRoutine()
     {
-        Enemy[] allEnemies = FindObjectsByType<Enemy>(FindObjectsSortMode.None);
+        EnemyBall[] allEnemies = FindObjectsByType<EnemyBall>(FindObjectsSortMode.None);
         
-        foreach (Enemy enemy in allEnemies)
+        foreach (EnemyBall enemy in allEnemies)
         {
             if (enemy != null && enemy.hitpoints <= 0)
             {
-                Destroy(enemy.gameObject);
+                enemy.Die(); // This will handle the destructio
             }
         }
 
         yield return new WaitForEndOfFrame(); // this is because enemies take one frame to be destroyed so we need to wait.
 
-        Enemy[] remainingEnemies = FindObjectsByType<Enemy>(FindObjectsSortMode.None);
+        EnemyBall[] remainingEnemies = FindObjectsByType<EnemyBall>(FindObjectsSortMode.None);
         string turnText = "Turn: " + turnCount;
         enemiesCountText.text = "Enemies: " + remainingEnemies.Length + "/" + maxEnemiesAllowed + "\n" + turnText;
         
@@ -82,7 +82,7 @@ public class TurnManager : MonoBehaviour
         yield return new WaitForSeconds(1f);
 
         // Find all balls currently in the game
-        BaseBall[] allBalls = FindObjectsByType<BaseBall>(FindObjectsSortMode.None);
+        BaseBall[] allBalls = FindObjectsByType<BaseBall>(FindObjectsInactive.Include,FindObjectsSortMode.None);
         bool isSettled = false;
 
         while (!isSettled)
@@ -90,7 +90,7 @@ public class TurnManager : MonoBehaviour
             isSettled = true;
             foreach (BaseBall ball in allBalls)
             {
-                if (ball.IsMoving())
+                if (ball.IsBusy())
                 {
                     isSettled = false;
                     break; // No need to check the rest this frame
