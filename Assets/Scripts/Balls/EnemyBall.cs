@@ -74,6 +74,13 @@ public class EnemyBall : BaseBall
 
                 rb.AddForce(-dir * bonusForce, ForceMode2D.Impulse);          // push this one back
                 otherEnemy.rb.AddForce(dir * bonusForce, ForceMode2D.Impulse); // push other one away
+
+                // freeze time briefly
+                if (GameFeelManager.Instance != null) 
+                {
+                    GameFeelManager.Instance.HitStop(0.05f);
+                    GameFeelManager.Instance.ShakeCamera(0.1f, 0.1f);
+                }
             }
 
         }
@@ -82,6 +89,8 @@ public class EnemyBall : BaseBall
         if (player != null)
         {
             TakeDamage(1);
+            // freeze time breifly on hit
+            GameFeelManager.Instance.HitStop(0.04f);
         }
     }
 

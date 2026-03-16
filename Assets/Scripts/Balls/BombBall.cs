@@ -71,6 +71,12 @@ public class BombBall : EnemyBall
         //expand sprite to indicate explosion
         spriteRenderer.transform.localScale *= explosionMagnitude; //TODO:later we can use like lerp or something to handle
 
+        if (GameFeelManager.Instance != null)
+        {
+            GameFeelManager.Instance.HitStop(0.1f);
+            GameFeelManager.Instance.ShakeCamera(0.3f, 0.4f); // Bigger shake for bombs!
+        }
+
         // Find all colliders in the explosion radius
         Collider2D[] colliders = Physics2D.OverlapCircleAll(transform.position, explosionMagnitude/2f);
 
