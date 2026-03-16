@@ -131,7 +131,7 @@ GameObject:
   - component: {fileID: 30023885}
   - component: {fileID: 30023884}
   m_Layer: 5
-  m_Name: TopText
+  m_Name: BestText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -268,7 +268,7 @@ GameObject:
   - component: {fileID: 87095806}
   - component: {fileID: 87095805}
   m_Layer: 5
-  m_Name: BestTimeText
+  m_Name: HitPointText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -290,7 +290,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: -714, y: 590}
+  m_AnchoredPosition: {x: -714, y: 492.1}
   m_SizeDelta: {x: 280, y: 2}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &87095805
@@ -379,7 +379,7 @@ MonoBehaviour:
   m_VertexBufferAutoSizeReduction: 0
   m_useMaxVisibleDescender: 1
   m_pageToDisplay: 1
-  m_margin: {x: 0, y: 0, z: 0, w: 0}
+  m_margin: {x: 0, y: 0, z: 0, w: -47.20591}
   m_isUsingLegacyAnimationComponent: 0
   m_isVolumetricText: 0
   m_hasFontAssetChanged: 0
@@ -423,7 +423,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TurnManager
   enemyInstantiator: {fileID: 1867681342}
-  enemiesCountText: {fileID: 617656866}
+  ballLauncher: {fileID: 1462797460}
 --- !u!4 &154066431
 Transform:
   m_ObjectHideFlags: 0
@@ -1933,6 +1933,7 @@ MonoBehaviour:
   lookInputAction: {fileID: -5630151704836100654, guid: 2bcd2660ca9b64942af0de543d8d7100, type: 3}
   touchScreenControls: {fileID: 676166219}
   playerPosition: {fileID: 1462797462}
+  maxDragDistance: 3
 --- !u!4 &1203119254
 Transform:
   m_ObjectHideFlags: 0
@@ -1943,6 +1944,55 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 382.50598, y: 210.67836, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1218871971
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1218871973}
+  - component: {fileID: 1218871972}
+  m_Layer: 0
+  m_Name: UIManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1218871972
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1218871971}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d4c45ce8c3d0aee438cf84829636157c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::UIManager
+  hitPointText: {fileID: 87095805}
+  bestTimeText: {fileID: 30023884}
+  enemiesCountText: {fileID: 617656866}
+  gameOverScreen: {fileID: 1502047792}
+  inGameMenu: {fileID: 1635185271}
+--- !u!4 &1218871973
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1218871971}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 257.464, y: 383.88196, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -2544,7 +2594,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: f329587900555449caa68e16b47bcb05, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::Player
-  hitPointText: {fileID: 2042300714}
 --- !u!114 &1462797458
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3050,9 +3099,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a14f5cf8042504653ad2f0f73cfff3e5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameManager
-  bestTimeText: {fileID: 87095805}
-  gameOverScreen: {fileID: 1502047790}
-  inGameMenu: {fileID: 1635185271}
 --- !u!1 &1760852578
 GameObject:
   m_ObjectHideFlags: 0
@@ -3444,6 +3490,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::EnemyInstantiator
   enemyPrefab: {fileID: 8753799142762896369, guid: 1722dce0d469e414b81bdf0f357c77c2, type: 3}
   bombPrefab: {fileID: 8753799142762896369, guid: 6322ee9f5719de54197d2d0934906e4e, type: 3}
+  spikePrefab: {fileID: 8753799142762896369, guid: 043a02c1312490f488f7493cf3adf309, type: 3}
 --- !u!1 &2042300712
 GameObject:
   m_ObjectHideFlags: 0
@@ -3461,7 +3508,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &2042300713
 RectTransform:
   m_ObjectHideFlags: 0
@@ -3638,3 +3685,4 @@ SceneRoots:
   - {fileID: 1203119254}
   - {fileID: 154066431}
   - {fileID: 1462797462}
+  - {fileID: 1218871973}

@@ -7,27 +7,35 @@ using UnityEngine.InputSystem;
 public class PlayerBall : BaseBall
 {
     public float speed {get; private set;} = 10f;
-    public TMPro.TextMeshPro hitPointText;
-
+    private int hitPoints = 3;
 
     void Start()
     {
+        UIManager.Instance.UpdatePlayerHealth(hitPoints);
     }
 
     void Update()
     {
         transform.up = InputManager.Instance.aimDirection.normalized;
     }
-
-    void OnTriggerEnter2D(Collider2D other)
+    public void TakeDamage(int damage)
     {
-        if (other.gameObject.CompareTag("Enemy"))
+        hitPoints -= damage;
+        if (UIManager.Instance != null)
         {
-            print("Player collided with enemy!");
-            // Enemy enemy = other.GetComponent<Enemy>();
-            // TakeDamage(enemy.hitpoints);
-            // Destroy(other.gameObject);
+            UIManager.Instance.UpdatePlayerHealth(hitPoints);
         }
+
+        if (hitPoints <= 0)
+        {
+            Die();
+        }
+    }
+
+    private void Die()
+    {
+        gameObject.SetActive(false);
+        GameManager.Instance.ChangeState(GameState.GameOver);
     }
 
 }

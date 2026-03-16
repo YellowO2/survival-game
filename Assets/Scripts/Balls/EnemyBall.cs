@@ -8,17 +8,15 @@ public enum BallType { Normal, Bomb, Spike }
 public class EnemyBall : BaseBall
 {
     //Properties of an enemy
-    public int hitpoints = 1;
+    public int hitpoints{ get; private set; } = 1 ;
     public BallColor color { get; private set; }
     public BallType type { get; private set; }
-    public int originalHitpoints; // the original hitpoints of the enemy
     public TMPro.TextMeshPro hitpointsText;
     protected SpriteRenderer spriteRenderer;
 
     public virtual void SetUp(int hitpoints, BallColor color, BallType type = BallType.Normal)
     {
         this.hitpoints = hitpoints;
-        this.originalHitpoints = hitpoints;
         this.color = color;
         this.type = type;
         hitpointsText.text = hitpoints.ToString();
@@ -59,9 +57,9 @@ public class EnemyBall : BaseBall
         Destroy(gameObject);
     }
 
-    private void OnCollisionEnter2D(Collision2D collision)
+    protected virtual void OnCollisionEnter2D(Collision2D collision)
     {
-        // Check if we hit another enemy 9r the player
+        // Check if we hit another enemy or the player
         EnemyBall otherEnemy = collision.gameObject.GetComponent<EnemyBall>();
 
         if (otherEnemy != null)

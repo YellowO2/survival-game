@@ -40,13 +40,14 @@ public class BombBall : EnemyBall
 
         // Boom time
         Explode();
-        isTicking = false;
+        
         
         //time for a short time
         yield return new WaitForSeconds(0.1f);
         // cannot destroy immediately because turnmanager checking. So should basically make it non existence and not interactable but not destroy it
         gameObject.SetActive(false);
         rb.linearVelocity = Vector2.zero; // Stop any movement immediately
+        isTicking = false;
     }
 
     public override void TakeDamage(int damage)

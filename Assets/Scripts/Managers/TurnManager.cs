@@ -9,7 +9,6 @@ public class TurnManager : MonoBehaviour
     public EnemyInstantiator enemyInstantiator;
     public TurnPhase phase { get; private set; }
     private int maxEnemiesAllowed = 5;
-    public TMPro.TextMeshProUGUI enemiesCountText; //lets just use this for the turn count as well.
     public int turnCount { get; private set; } = 0;
 
 
@@ -32,8 +31,8 @@ public class TurnManager : MonoBehaviour
         turnCount++;
         phase = TurnPhase.Spawn;
         enemyInstantiator.GenerateMultipleEnemies(2);
-        string turnText = "Turn: " + turnCount;
-        enemiesCountText.text = "Enemies: " + FindObjectsByType<EnemyBall>(FindObjectsSortMode.None).Length + "/" + maxEnemiesAllowed + "\n" + turnText;
+        int currentEnemies = FindObjectsByType<EnemyBall>(FindObjectsSortMode.None).Length;
+        UIManager.Instance.UpdateTurnAndEnemyCount(currentEnemies, maxEnemiesAllowed, turnCount);
         phase = TurnPhase.PlayerAim;
     }
     public void OnShotFired()
@@ -44,6 +43,7 @@ public class TurnManager : MonoBehaviour
     }
     public void OnPhysicsSettled()
     {
+        Debug.Log("Physics settled, starting resolve phase.");
         if (phase != TurnPhase.WaitPhysicsSettle) return;
         phase = TurnPhase.Resolving;
         StartCoroutine(ResolvePhaseRoutine());
@@ -52,24 +52,24 @@ public class TurnManager : MonoBehaviour
     private IEnumerator ResolvePhaseRoutine()
     {
         EnemyBall[] allEnemies = FindObjectsByType<EnemyBall>(FindObjectsSortMode.None);
-        
+
         foreach (EnemyBall enemy in allEnemies)
         {
             if (enemy != null && enemy.hitpoints <= 0)
             {
-                enemy.Die(); // This will handle the destructio
+                enemy.Die(); // This will handle the destruction
             }
         }
 
         yield return new WaitForEndOfFrame(); // this is because enemies take one frame to be destroyed so we need to wait.
 
         EnemyBall[] remainingEnemies = FindObjectsByType<EnemyBall>(FindObjectsSortMode.None);
-        string turnText = "Turn: " + turnCount;
-        enemiesCountText.text = "Enemies: " + remainingEnemies.Length + "/" + maxEnemiesAllowed + "\n" + turnText;
-        
+
+        UIManager.Instance.UpdateTurnAndEnemyCount(remainingEnemies.Length, maxEnemiesAllowed, turnCount);
+
         if (remainingEnemies.Length > maxEnemiesAllowed)
         {
-            GameManager.Instance.ChangeState(GameManager.GameState.GameOver);
+            GameManager.Instance.ChangeState(GameState.GameOver);
         }
         else
         {
@@ -82,7 +82,7 @@ public class TurnManager : MonoBehaviour
         yield return new WaitForSeconds(1f);
 
         // Find all balls currently in the game
-        BaseBall[] allBalls = FindObjectsByType<BaseBall>(FindObjectsInactive.Include,FindObjectsSortMode.None);
+        BaseBall[] allBalls = FindObjectsByType<BaseBall>(FindObjectsInactive.Include, FindObjectsSortMode.None);
         bool isSettled = false;
 
         while (!isSettled)

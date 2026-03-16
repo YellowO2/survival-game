@@ -7,6 +7,7 @@ public class EnemyInstantiator : MonoBehaviour
     [Header("Prefabs")]
     public GameObject enemyPrefab;
     public GameObject bombPrefab;
+    public GameObject spikePrefab;
     private int maxAttempts = 15; // Maximum attempts to find a valid spawn position
     float spawnAreaLength = 10f; //length of each side of the square spawn area
     float enemyRadius = 1;
@@ -35,6 +36,10 @@ public class EnemyInstantiator : MonoBehaviour
         if (Random.value <= 0.2 && bombPrefab != null)
         {
             prefabToSpawn = bombPrefab;
+        }
+        else if (Random.value <= 0.4 && spikePrefab != null)
+        {
+            prefabToSpawn = spikePrefab;
         }
         EnemyBall enemy = Instantiate(prefabToSpawn, spawnPosition, Quaternion.identity).GetComponent<EnemyBall>();
         enemy.SetUp(GenerateEnemyHitpoints(), ColorFromIndex(colorIndex));
