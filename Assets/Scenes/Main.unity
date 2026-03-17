@@ -3084,6 +3084,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 62aa30cd1403cb14abd8dfb0b9fa53d5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::GameFeelManager
+  hitParticlesPrefab: {fileID: 6673683171231205794, guid: 7514b2ab2e435f94f87e95f7e890be5a, type: 3}
+  deathParticlesPrefab: {fileID: 6673683171231205794, guid: 7514b2ab2e435f94f87e95f7e890be5a, type: 3}
 --- !u!4 &1716139142
 Transform:
   m_ObjectHideFlags: 0
