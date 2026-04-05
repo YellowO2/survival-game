@@ -46,7 +46,8 @@ public class UIManager : MonoBehaviour
     {
         if (hitPointText != null)
         {
-            hitPointText.text = currentHealth.ToString();
+            hitPointText.gameObject.SetActive(false);
+            // hitPointText.text = currentHealth.ToString();
         }
     }
 

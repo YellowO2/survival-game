@@ -16,7 +16,7 @@ public class SpikeBall : EnemyBall
         PlayerBall player = collision.gameObject.GetComponent<PlayerBall>();
         if (player != null)
         {
-            player.TakeDamage(spikeDamage);
+            // player.TakeDamage(spikeDamage);
         }
     }
 }

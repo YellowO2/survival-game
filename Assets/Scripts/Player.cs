@@ -11,7 +11,7 @@ public class PlayerBall : BaseBall
 
     void Start()
     {
-        UIManager.Instance.UpdatePlayerHealth(hitPoints);
+        // UIManager.Instance.UpdatePlayerHealth(hitPoints);
     }
 
     void Update()
@@ -20,16 +20,16 @@ public class PlayerBall : BaseBall
     }
     public void TakeDamage(int damage)
     {
-        hitPoints -= damage;
-        if (UIManager.Instance != null)
-        {
-            UIManager.Instance.UpdatePlayerHealth(hitPoints);
-        }
+        // hitPoints -= damage;
+        // if (UIManager.Instance != null)
+        // {
+        //     UIManager.Instance.UpdatePlayerHealth(hitPoints);
+        // }
 
-        if (hitPoints <= 0)
-        {
-            Die();
-        }
+        // if (hitPoints <= 0)
+        // {
+        //     Die();
+        // }
     }
 
     private void Die()
