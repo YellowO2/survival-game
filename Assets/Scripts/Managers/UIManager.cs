@@ -33,6 +33,15 @@ public class UIManager : MonoBehaviour
         UpdateScore(0); // Assuming starting with 0 score
     }
 
+    void Update()
+    {
+        if (scoreText != null)
+        {
+            // Smoothly shrink the text back down to its normal size
+            scoreText.transform.localScale = Vector3.Lerp(scoreText.transform.localScale, Vector3.one, Time.deltaTime * 5f);
+        }
+    }
+
     public void UpdatePlayerHealth(int currentHealth)
     {
         if (hitPointText != null)
@@ -63,6 +72,9 @@ public class UIManager : MonoBehaviour
         if (scoreText != null)
         {
             scoreText.text = "Score: " + newScore.ToString();
+            
+            // Make the text pop bigger! The update loop will shrink it back down
+            scoreText.transform.localScale = Vector3.one * 1.5f;
         }
     }
 

@@ -1,15 +1,26 @@
 using UnityEngine;
-//TODO : this is useless current, consider cleaning up later.
+
 public class ScoreManager : MonoBehaviour
 {
-    public TMPro.TextMeshProUGUI scoreText;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    public static ScoreManager Instance { get; private set; }
+
+    public int score { get; private set; }
+    private int currentTurnCombo;
+
+    void Awake()
     {
+        if (Instance == null) Instance = this;
+        else Destroy(gameObject);
     }
 
-    // Update is called once per frame
-    void Update()
+    public void ResetCombo()
     {
+        currentTurnCombo = 0;
+    }
+
+    public void AddScore(int basePoints)
+    {
+        currentTurnCombo++;
+        score += basePoints * currentTurnCombo;
     }
 }

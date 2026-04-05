@@ -11,8 +11,6 @@ public class TurnManager : MonoBehaviour
     private int maxEnemiesAllowed = 5;
     public int turnCount { get; private set; } = 0;
     public int turnDamage { get; private set; } = 0;
-    public int totalScore { get; private set; } = 0;
-
 
     void Awake()
     {
@@ -36,25 +34,31 @@ public class TurnManager : MonoBehaviour
         enemyInstantiator.GenerateMultipleEnemies(2);
         int currentEnemies = FindObjectsByType<EnemyBall>(FindObjectsSortMode.None).Length;
         UIManager.Instance.UpdateTurnAndEnemyCount(currentEnemies, maxEnemiesAllowed, turnCount);
-        UIManager.Instance.UpdateScore(totalScore);
+        UIManager.Instance.UpdateScore(ScoreManager.Instance.score);
         phase = TurnPhase.PlayerAim;
     }
     public void OnShotFired()
     {
         if (phase != TurnPhase.PlayerAim) return;
         phase = TurnPhase.WaitPhysicsSettle;
+        
+        // Reset the combo at the start of every shot
+        ScoreManager.Instance.ResetCombo();
+        
         StartCoroutine(WaitForPhysicsToSettle());
     }
 
     public void RecordDamage(int amount)
     {
-            turnDamage += amount;
-            totalScore += amount;
-            
-            if (UIManager.Instance != null)
-            {
-                UIManager.Instance.UpdateScore(totalScore);
-            }
+        turnDamage += amount;
+        
+        // Let the ScoreManager handle the combo math and adding the points
+        ScoreManager.Instance.AddScore(amount);
+        
+        if (UIManager.Instance != null)
+        {
+            UIManager.Instance.UpdateScore(ScoreManager.Instance.score);
+        }
     }
 
     public void OnPhysicsSettled()
