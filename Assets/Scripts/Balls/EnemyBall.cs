@@ -52,7 +52,6 @@ public class EnemyBall : BaseBall
         hitpointsText.text = hitpoints.ToString();
         TurnManager.Instance.RecordDamage(damage);
     }
-
     public virtual void Die() //only for calling during the resolve phase
     {
 

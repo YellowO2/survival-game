@@ -18,19 +18,19 @@ public class PlayerBall : BaseBall
     {
         transform.up = InputManager.Instance.aimDirection.normalized;
     }
-    public void TakeDamage(int damage)
-    {
-        // hitPoints -= damage;
-        // if (UIManager.Instance != null)
-        // {
-        //     UIManager.Instance.UpdatePlayerHealth(hitPoints);
-        // }
+    // public void TakeDamage(int damage)
+    // {
+    //     // hitPoints -= damage;
+    //     // if (UIManager.Instance != null)
+    //     // {
+    //     //     UIManager.Instance.UpdatePlayerHealth(hitPoints);
+    //     // }
 
-        // if (hitPoints <= 0)
-        // {
-        //     Die();
-        // }
-    }
+    //     // if (hitPoints <= 0)
+    //     // {
+    //     //     Die();
+    //     // }
+    // }
 
     private void Die()
     {

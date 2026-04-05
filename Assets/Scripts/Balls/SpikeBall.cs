@@ -2,7 +2,6 @@ using UnityEngine;
 
 public class SpikeBall : EnemyBall
 {
-    private int spikeDamage = 1;
 
     public override void SetUp(int hitpoints, BallColor color, BallType type = BallType.Spike)
     {

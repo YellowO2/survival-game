@@ -14,9 +14,28 @@ public class BombBall : EnemyBall
     public override void SetUp(int hitpoints, BallColor color, BallType type = BallType.Bomb)
     {
         base.SetUp(hitpoints, color, BallType.Bomb);
+        AddBombIndicator();
+    }
+
+    private void AddBombIndicator()
+    {
+        // Spawns a tiny dark circle on the top right to look like a bomb's fuse
+        GameObject indicator = new GameObject("BombIndicator");
+        indicator.transform.SetParent(this.transform);
+        
+        // Position it at the top right
+        indicator.transform.localPosition = new Vector3(0.25f, 0.3f, 0f);
+        // Make it very small
+        indicator.transform.localScale = new Vector3(0.25f, 0.25f, 1f);
+
+        SpriteRenderer indicatorSprite = indicator.AddComponent<SpriteRenderer>();
         if (spriteRenderer != null)
         {
-            transform.localScale = new Vector3(1.2f, 1.2f, 1.2f); //for now use slightly larger to indicate
+            // Re-use the existing circle sprite but make it a dark color
+            indicatorSprite.sprite = spriteRenderer.sprite;
+            indicatorSprite.color = new Color(0.1f, 0.1f, 0.1f); 
+            // Ensure it renders on top of the main ball
+            indicatorSprite.sortingOrder = spriteRenderer.sortingOrder + 1;
         }
     }
 
