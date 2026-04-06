@@ -59,6 +59,26 @@ public class TurnManager : MonoBehaviour
         int currentEnemies = FindObjectsByType<EnemyBall>(FindObjectsSortMode.None).Length;
         UIManager.Instance.UpdateTurnAndEnemyCount(currentEnemies, maxEnemiesAllowed, turnCount);
         UIManager.Instance.UpdateScore(ScoreManager.Instance.score);
+
+        // Freeze non-matching colored balls so they act as solid obstacles
+        EnemyBall[] allEnemies = FindObjectsByType<EnemyBall>(FindObjectsSortMode.None);
+        foreach (EnemyBall enemy in allEnemies)
+        {
+            if (enemy != null && enemy.rb != null)
+            {
+                if (enemy.color != player.currentColor)
+                {
+                    enemy.rb.bodyType = RigidbodyType2D.Kinematic;
+                    enemy.rb.linearVelocity = Vector2.zero;
+                    enemy.rb.angularVelocity = 0f;
+                }
+                else
+                {
+                    enemy.rb.bodyType = RigidbodyType2D.Dynamic;
+                }
+            }
+        }
+
         phase = TurnPhase.PlayerAim;
     }
     public void OnShotFired()
@@ -99,9 +119,18 @@ public class TurnManager : MonoBehaviour
 
         foreach (EnemyBall enemy in allEnemies)
         {
-            if (enemy != null && enemy.hitpoints <= 0)
+            if (enemy != null)
             {
-                enemy.Die(); // This will handle the destruction
+                // Reset all balls back to dynamic before the next turn/spawns happen
+                if (enemy.rb != null)
+                {
+                    enemy.rb.bodyType = RigidbodyType2D.Dynamic;
+                }
+
+                if (enemy.hitpoints <= 0)
+                {
+                    enemy.Die(); // This will handle the destruction
+                }
             }
         }
 

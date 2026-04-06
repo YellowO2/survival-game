@@ -62,7 +62,7 @@ public class EnemyBall : BaseBall
 
         if (GameFeelManager.Instance != null && spriteRenderer != null)
         {
-            GameFeelManager.Instance.HitStop(0.15f);
+            GameFeelManager.Instance.HitStop(0.07f);
             GameFeelManager.Instance.ShakeCamera(0.1f, 0.1f);
             GameFeelManager.Instance.SpawnHitEffect(contactPoint, spriteRenderer.color);
         }
