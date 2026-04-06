@@ -52,6 +52,22 @@ public class EnemyBall : BaseBall
         hitpointsText.text = hitpoints.ToString();
         TurnManager.Instance.RecordDamage(damage);
     }
+
+    public void ApplyImpact(Vector2 sourcePosition, Vector2 contactPoint)
+    {
+        Vector2 dir = ((Vector2)transform.position - sourcePosition).normalized;
+        float bonusForce = 2.5f;
+
+        rb.AddForce(dir * bonusForce, ForceMode2D.Impulse); // Push away from the source
+
+        if (GameFeelManager.Instance != null && spriteRenderer != null)
+        {
+            GameFeelManager.Instance.HitStop(0.15f);
+            GameFeelManager.Instance.ShakeCamera(0.1f, 0.1f);
+            GameFeelManager.Instance.SpawnHitEffect(contactPoint, spriteRenderer.color);
+        }
+    }
+
     public virtual void Die() //only for calling during the resolve phase
     {
 
@@ -70,33 +86,18 @@ public class EnemyBall : BaseBall
             if (this.color == otherEnemy.color)
             {
                 TakeDamage(1);
-                Vector2 dir = (otherEnemy.transform.position - transform.position).normalized;
-                float bonusForce = 2.5f;
-
-                rb.AddForce(-dir * bonusForce, ForceMode2D.Impulse);          // push this one back
-                otherEnemy.rb.AddForce(dir * bonusForce, ForceMode2D.Impulse); // push other one away
-
-                if (GameFeelManager.Instance != null && spriteRenderer != null)
-                {
-                    GameFeelManager.Instance.HitStop(0.05f);
-                    GameFeelManager.Instance.ShakeCamera(0.1f, 0.1f);
-
-                    Vector2 contactPoint = collision.GetContact(0).point;
-                    GameFeelManager.Instance.SpawnHitEffect(contactPoint, spriteRenderer.color);
-                }
+                ApplyImpact(otherEnemy.transform.position, collision.GetContact(0).point);
             }
-
         }
 
         PlayerBall player = collision.gameObject.GetComponent<PlayerBall>();
         if (player != null)
         {
-            TakeDamage(1);
-            if (GameFeelManager.Instance != null && spriteRenderer != null)
+            // Only take damage and apply impact if the player's color matches the enemy's color!
+            if (player.currentColor == this.color)
             {
-                GameFeelManager.Instance.HitStop(0.04f);
-                Vector2 contactPoint = collision.GetContact(0).point;
-                GameFeelManager.Instance.SpawnHitEffect(contactPoint, spriteRenderer.color);
+                TakeDamage(1);
+                ApplyImpact(player.transform.position, collision.GetContact(0).point);
             }
         }
     }

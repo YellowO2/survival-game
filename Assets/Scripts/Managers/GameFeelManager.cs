@@ -25,7 +25,7 @@ public class GameFeelManager : MonoBehaviour
     /// <summary>
     /// Freezes or slows down time for a tiny fraction of a second to make hits feel heavy.
     /// </summary>
-    public void HitStop(float duration = 0.15f)
+    public void HitStop(float duration)
     {
         if (isHitStopping) return;
         StartCoroutine(HitStopRoutine(duration));

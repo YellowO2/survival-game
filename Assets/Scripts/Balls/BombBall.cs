@@ -6,7 +6,7 @@ public class BombBall : EnemyBall
 {
 
     [Header("Explosion Settings")]
-    private float explosionMagnitude = 3f;
+    private float explosionMagnitude = 5f;
     private int explosionDamage = 3;
     private float explosionForce = 3f;
     private bool isTicking = false;

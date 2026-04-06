@@ -8,7 +8,8 @@ public class TurnManager : MonoBehaviour
     public static TurnManager Instance { get; private set; }
     public EnemyInstantiator enemyInstantiator;
     public TurnPhase phase { get; private set; }
-    private int maxEnemiesAllowed = 5;
+    public PlayerBall player;
+    private int maxEnemiesAllowed = 25;
     public int turnCount { get; private set; } = 0;
     public int turnDamage { get; private set; } = 0;
 
@@ -30,8 +31,31 @@ public class TurnManager : MonoBehaviour
     {
         turnCount++;
         turnDamage = 0; // Reset turn damage for the new turn
+        player.SwitchColor(); // alternate color every turn to add strategy
         phase = TurnPhase.Spawn;
-        enemyInstantiator.GenerateMultipleEnemies(2);
+
+        if (turnCount == 1)
+        {
+            // Initial pool break setup
+            enemyInstantiator.GeneratePoolTriangle(Vector3.zero); // Spawn triangle at center of arena
+            
+            // Move player to a typical break position (like the head string)
+            PlayerBall player = FindFirstObjectByType<PlayerBall>();
+            if (player != null)
+            {
+                player.transform.position = new Vector3(0, -5f, 0); // Position below the center
+                if (player.rb != null)
+                {
+                    player.rb.linearVelocity = Vector2.zero;
+                    player.rb.angularVelocity = 0f;
+                }
+            }
+        }
+        else
+        {
+            enemyInstantiator.GenerateMultipleEnemies(3 + turnCount/5); // increase number every 5 turns.
+        }
+
         int currentEnemies = FindObjectsByType<EnemyBall>(FindObjectsSortMode.None).Length;
         UIManager.Instance.UpdateTurnAndEnemyCount(currentEnemies, maxEnemiesAllowed, turnCount);
         UIManager.Instance.UpdateScore(ScoreManager.Instance.score);

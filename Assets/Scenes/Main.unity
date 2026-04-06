@@ -467,6 +467,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::TurnManager
   enemyInstantiator: {fileID: 1867681342}
+  player: {fileID: 1462797457}
 --- !u!4 &154066431
 Transform:
   m_ObjectHideFlags: 0

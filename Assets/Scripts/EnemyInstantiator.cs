@@ -20,16 +20,60 @@ public class EnemyInstantiator : MonoBehaviour
 
     public void GenerateMultipleEnemies(int count)
     {
+        // Pick a dominant color for this spawn cluster to encourage chains
+        int dominantColorIndex = Random.Range(0, 4);
+
+        // Pick a random central point for this cluster
+        float halfLength = spawnAreaLength / 2f;
+        Vector2 clusterCenter = new Vector2(Random.Range(-halfLength, halfLength), Random.Range(-halfLength, halfLength));
+        float clusterRadius = Mathf.Max(3f, count * enemyRadius); 
+
         for (int i = 0; i < count; i++)
         {
-            GenerateEnemy();
+            // 75% chance to use the dominant color, 25% chance for a random color
+            int colorIndex = (Random.value < 0.75f) ? dominantColorIndex : Random.Range(0, 4);
+            
+            Vector3 spawnPos = GetSpawnPositionNear(clusterCenter, clusterRadius, enemyRadius);
+            // Fallback to anywhere on the board if the cluster is too crowded
+            if (spawnPos == Vector3.zero)
+            {
+                spawnPos = GetSpawnPosition(enemyRadius);
+            }
+
+            GenerateEnemy(spawnPos, colorIndex);
         }
     }
 
-    public void GenerateEnemy()
+    public void GeneratePoolTriangle(Vector3 center)
     {
-        int colorIndex = Random.Range(0, 4);
-        UnityEngine.Vector3 spawnPosition = GetSpawnPosition(enemyRadius);
+        int rows = 3; // 1+2+3 = 6 enemies
+        // Using enemyRadius for spacing calculation
+        float ballSpacing = enemyRadius * 1.5f; 
+
+        // Offset to center the triangle cluster around `center` position 
+        float yStartOffset = -((rows - 1) * ballSpacing * 0.866f) / 3f; // Optional center offset
+
+        for (int row = 0; row < rows; row++)
+        {
+            for (int col = 0; col <= row; col++)
+            {
+                float xOffset = (col - (row / 2f)) * ballSpacing;
+                float yOffset = row * ballSpacing * 0.866f + yStartOffset; 
+
+                Vector3 spawnPosition = center + new Vector3(xOffset, yOffset, 0);
+
+                int colorIndex = Random.Range(0, 4);
+                
+                // we will stick to mostly regular enemies for the break opening.
+                EnemyBall enemy = Instantiate(enemyPrefab, spawnPosition, Quaternion.identity).GetComponent<EnemyBall>();
+                enemy.SetUp(GenerateEnemyHitpoints(), ColorFromIndex(colorIndex));
+            }
+        }
+    }
+
+    public void GenerateEnemy(Vector3 spawnPosition, int predeterminedColorIndex = -1)
+    {
+        int colorIndex = predeterminedColorIndex >= 0 ? predeterminedColorIndex : Random.Range(0, 4);
 
         // Decide which prefab to spawn based on probability
         GameObject prefabToSpawn = enemyPrefab;
@@ -52,6 +96,32 @@ public class EnemyInstantiator : MonoBehaviour
         // Wrap index so any int works (negative/large)
         int safeIndex = ((index % AllColors.Length) + AllColors.Length) % AllColors.Length;
         return AllColors[safeIndex];
+    }
+
+    public Vector3 GetSpawnPositionNear(Vector2 clusterCenter, float clusterRadius, float enemyRadius)
+    {
+        float halfLength = spawnAreaLength / 2f;
+        for (int i = 0; i < maxAttempts; i++)
+        {
+            // Pick a random spot within the cluster radius
+            Vector2 randomOffset = Random.insideUnitCircle * clusterRadius;
+            Vector2 potentialPoint = clusterCenter + randomOffset;
+            
+            // Constrain it inside the spawn area bounds
+            potentialPoint.x = Mathf.Clamp(potentialPoint.x, -halfLength, halfLength);
+            potentialPoint.y = Mathf.Clamp(potentialPoint.y, -halfLength, halfLength);
+
+            // check if nothing will collide if spawned there
+            Collider2D overlappingCollider = Physics2D.OverlapCircle(potentialPoint, enemyRadius + 0.4f);
+
+            if (overlappingCollider == null)
+            {
+                // We found an empty spot!
+                return potentialPoint;
+            }
+        }
+        
+        return Vector3.zero; // Return zero vector if no spot is found near
     }
 
     public Vector3 GetSpawnPosition(float enemyRadius)
