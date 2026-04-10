@@ -1,3 +1,4 @@
+using System;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -13,7 +14,8 @@ public class InputManager : MonoBehaviour
 
     public InputActionReference lookInputAction;
 
-    public bool isAttacking { get; private set; } //detects if right game pad or mouse button is being presseds
+    public event Action OnAttackStarted;
+    public event Action OnAttackEnded;
     public GameObject touchScreenControls;
     public Vector2 aimDirection { get; private set; }
     public Transform playerPosition;
@@ -59,11 +61,11 @@ public class InputManager : MonoBehaviour
             aimDirection = lookInputAction.action.ReadValue<Vector2>();
             if (lookInputAction.action.WasPressedThisFrame())
             {
-                isAttacking = true;
+                OnAttackStarted?.Invoke();
             }
             else if (lookInputAction.action.WasReleasedThisFrame())
             {
-                isAttacking = false;
+                OnAttackEnded?.Invoke();
             }
             return;
         }
@@ -81,11 +83,11 @@ public class InputManager : MonoBehaviour
             aimDirection = rawAimDirection.sqrMagnitude > 0.0001f ? rawAimDirection.normalized : Vector2.zero;
             if (Mouse.current.leftButton.wasPressedThisFrame)
             {
-                isAttacking = true;
+                OnAttackStarted?.Invoke();
             }
             else if (Mouse.current.leftButton.wasReleasedThisFrame)
             {
-                isAttacking = false;
+                OnAttackEnded?.Invoke();
             }
             return;
         }

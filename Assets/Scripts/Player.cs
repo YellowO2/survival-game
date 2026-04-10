@@ -9,6 +9,7 @@ public class PlayerBall : BaseBall
     public float speed {get; private set;} = 15f;
     public BallColor currentColor { get; private set; } = BallColor.Red;
     private SpriteRenderer spriteRenderer;
+    private int hitPoints = 5; //im not sure what this is for yet
 
     void Start()
     {
@@ -52,19 +53,31 @@ public class PlayerBall : BaseBall
                 break;
         }
     }
-    // public void TakeDamage(int damage)
-    // {
-    //     // hitPoints -= damage;
-    //     // if (UIManager.Instance != null)
-    //     // {
-    //     //     UIManager.Instance.UpdatePlayerHealth(hitPoints);
-    //     // }
+    public void Swallow(EnemyBall enemy)
+    {
+        hitPoints += enemy.hitpoints;
+        // Increase size slightly based on gained hitpoints
+        transform.localScale += new Vector3(0.1f, 0.1f, 0f) * enemy.hitpoints;
+        
+        enemy.Die();
+    }
 
-    //     // if (hitPoints <= 0)
-    //     // {
-    //     //     Die();
-    //     // }
-    // }
+    public void TakeDamage(int damage)
+    {
+        hitPoints -= damage;
+        // Decrease size slightly when taking damage, maintaining a minimum size constraint
+        transform.localScale = Vector3.Max(new Vector3(0.5f, 0.5f, 1f), transform.localScale - new Vector3(0.1f, 0.1f, 0f) * damage);
+
+        // if (UIManager.Instance != null)
+        // {
+        //     UIManager.Instance.UpdatePlayerHealth(hitPoints);
+        // }
+
+        if (hitPoints <= 0)
+        {
+            Die();
+        }
+    }
 
     private void Die()
     {

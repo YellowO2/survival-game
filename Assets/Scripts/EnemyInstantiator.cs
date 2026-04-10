@@ -9,12 +9,17 @@ public class EnemyInstantiator : MonoBehaviour
     public GameObject bombPrefab;
     public GameObject spikePrefab;
     private int maxAttempts = 15; // Maximum attempts to find a valid spawn position
-    float spawnAreaLength = 10f; //length of each side of the square spawn area
     float enemyRadius = 1;
+    private ArenaBounds arenaBounds;
+
+    void Awake()
+    {
+        arenaBounds = FindFirstObjectByType<ArenaBounds>();
+    }
 
     private int GenerateEnemyHitpoints()
     {
-        int hitpoints = Random.Range(1, 3 + Mathf.FloorToInt(TurnManager.Instance.turnCount / 5)); // Increase max hitpoints every 5 turns
+        int hitpoints = Random.Range(2, 3 + Mathf.FloorToInt(TurnManager.Instance.turnCount / 5)); // Increase max hitpoints every 5 turns
         return hitpoints;
     }
 
@@ -24,8 +29,10 @@ public class EnemyInstantiator : MonoBehaviour
         int dominantColorIndex = Random.Range(0, 4);
 
         // Pick a random central point for this cluster
-        float halfLength = spawnAreaLength / 2f;
-        Vector2 clusterCenter = new Vector2(Random.Range(-halfLength, halfLength), Random.Range(-halfLength, halfLength));
+        Vector2 arenaSize = arenaBounds.arenaSize;
+        float halfWidth = arenaSize.x / 2f;
+        float halfHeight = arenaSize.y / 2f;
+        Vector2 clusterCenter = new Vector2(Random.Range(-halfWidth, halfWidth), Random.Range(-halfHeight, halfHeight));
         float clusterRadius = Mathf.Max(3f, count * enemyRadius); 
 
         for (int i = 0; i < count; i++)
@@ -100,7 +107,9 @@ public class EnemyInstantiator : MonoBehaviour
 
     public Vector3 GetSpawnPositionNear(Vector2 clusterCenter, float clusterRadius, float enemyRadius)
     {
-        float halfLength = spawnAreaLength / 2f;
+        Vector2 arenaSize = arenaBounds.arenaSize;
+        float halfWidth = arenaSize.x / 2f;
+        float halfHeight = arenaSize.y / 2f;
         for (int i = 0; i < maxAttempts; i++)
         {
             // Pick a random spot within the cluster radius
@@ -108,8 +117,8 @@ public class EnemyInstantiator : MonoBehaviour
             Vector2 potentialPoint = clusterCenter + randomOffset;
             
             // Constrain it inside the spawn area bounds
-            potentialPoint.x = Mathf.Clamp(potentialPoint.x, -halfLength, halfLength);
-            potentialPoint.y = Mathf.Clamp(potentialPoint.y, -halfLength, halfLength);
+            potentialPoint.x = Mathf.Clamp(potentialPoint.x, -halfWidth, halfWidth);
+            potentialPoint.y = Mathf.Clamp(potentialPoint.y, -halfHeight, halfHeight);
 
             // check if nothing will collide if spawned there
             Collider2D overlappingCollider = Physics2D.OverlapCircle(potentialPoint, enemyRadius + 0.4f);
@@ -126,12 +135,14 @@ public class EnemyInstantiator : MonoBehaviour
 
     public Vector3 GetSpawnPosition(float enemyRadius)
     {
-        float halfLength = spawnAreaLength / 2f;
+        Vector2 arenaSize = arenaBounds.arenaSize;
+        float halfWidth = arenaSize.x / 2f;
+        float halfHeight = arenaSize.y / 2f;
         for (int i = 0; i < maxAttempts; i++)
         {
             // pick random spot
-            float randomX = Random.Range(-halfLength, halfLength);
-            float randomY = Random.Range(-halfLength, halfLength);
+            float randomX = Random.Range(-halfWidth, halfWidth);
+            float randomY = Random.Range(-halfHeight, halfHeight);
             Vector2 potentialPoint = new Vector2(randomX, randomY);
 
             // check if nothing will collide if spawned there

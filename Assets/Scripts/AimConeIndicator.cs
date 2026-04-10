@@ -45,20 +45,39 @@ public class AimConeIndicator : MonoBehaviour
         
         Vector2 reflectedDir;
         Vector2 reflectedEnd = end;
-        //now lets draw the reflected line
-        //the reflection is different for collision with ball vs collision with static wall
-        if (hit.collider != null && !hit.collider.CompareTag("Enemy")) //if hit wall
+        
+        // The reflection is different for collision with ball vs collision with static objects. 
+        // Balls with different colors as current turn player color behave as static objects (walls).
+        if (hit.collider != null)
         {
-            reflectedDir = Vector2.Reflect(aim, hit.normal).normalized;
-            reflectedEnd = (Vector2)end + (Vector2)(reflectedDir * 1);
-        }else if (hit.collider != null && hit.collider.CompareTag("Enemy")) //if hit enemy, which is a ball
-        {
-            //the result dir of hitting another ball would be the current vector, with the component in direction of collision removed
-            //because all the momentum in that direction is transferred during the collision.
-            reflectedDir = aim - Vector2.Dot(aim, hit.normal) * hit.normal;
-            reflectedDir.Normalize();
-            reflectedEnd = (Vector2)end + (Vector2)(reflectedDir * 1);
+            bool isSameColorEnemy = false;
+
+            if (hit.collider.CompareTag("Enemy"))
+            {
+                EnemyBall enemy = hit.collider.GetComponent<EnemyBall>();
+                if (enemy != null && TurnManager.Instance != null && TurnManager.Instance.player != null)
+                {
+                    if (enemy.color == TurnManager.Instance.player.currentColor)
+                    {
+                        isSameColorEnemy = true;
+                    }
+                }
+            }
+
+            if (isSameColorEnemy) // If we hit an enemy ball of the same color
+            {
+                // The result dir of hitting another dynamic ball (pool ball deflection)
+                reflectedDir = aim - Vector2.Dot(aim, hit.normal) * hit.normal;
+                if (reflectedDir.sqrMagnitude > 0.0001f) reflectedDir.Normalize();
+                reflectedEnd = (Vector2)end + (Vector2)(reflectedDir * 1);
+            }
+            else // It's either a wall, a different colored ball, or anything else
+            {
+                reflectedDir = Vector2.Reflect(aim, hit.normal).normalized;
+                reflectedEnd = (Vector2)end + (Vector2)(reflectedDir * 1);
+            }
         }
+        
         // Draw the reflected line
         leftLine.positionCount = 3; // We need 3 points to draw the original and reflected lines
         leftLine.SetPosition(2, reflectedEnd);

@@ -3,6 +3,7 @@ using UnityEngine;
 
 
 public enum TurnPhase { Spawn, PlayerAim, WaitPhysicsSettle, Resolving }
+
 public class TurnManager : MonoBehaviour
 {
     public static TurnManager Instance { get; private set; }
@@ -12,6 +13,8 @@ public class TurnManager : MonoBehaviour
     private int maxEnemiesAllowed = 25;
     public int turnCount { get; private set; } = 0;
     public int turnDamage { get; private set; } = 0;
+    public BallColor currentTurnPlayerColor { get; private set; }
+    
 
     void Awake()
     {
@@ -32,6 +35,7 @@ public class TurnManager : MonoBehaviour
         turnCount++;
         turnDamage = 0; // Reset turn damage for the new turn
         player.SwitchColor(); // alternate color every turn to add strategy
+        currentTurnPlayerColor = player.currentColor;
         phase = TurnPhase.Spawn;
 
         if (turnCount == 1)
@@ -53,9 +57,10 @@ public class TurnManager : MonoBehaviour
         }
         else
         {
+            Debug.Log($"Spawning enemies for turn {turnCount}");
             enemyInstantiator.GenerateMultipleEnemies(3 + turnCount/5); // increase number every 5 turns.
         }
-
+        Debug.Log($"Turn finish spawning.");
         int currentEnemies = FindObjectsByType<EnemyBall>(FindObjectsSortMode.None).Length;
         UIManager.Instance.UpdateTurnAndEnemyCount(currentEnemies, maxEnemiesAllowed, turnCount);
         UIManager.Instance.UpdateScore(ScoreManager.Instance.score);
@@ -66,19 +71,22 @@ public class TurnManager : MonoBehaviour
         {
             if (enemy != null && enemy.rb != null)
             {
+                Collider2D col = enemy.GetComponent<Collider2D>();
                 if (enemy.color != player.currentColor)
                 {
                     enemy.rb.bodyType = RigidbodyType2D.Kinematic;
                     enemy.rb.linearVelocity = Vector2.zero;
                     enemy.rb.angularVelocity = 0f;
+                    if (col != null) col.isTrigger = false;
                 }
                 else
                 {
                     enemy.rb.bodyType = RigidbodyType2D.Dynamic;
+                    if (col != null) col.isTrigger = true;
                 }
             }
         }
-
+        Debug.Log("change phase to player aim");
         phase = TurnPhase.PlayerAim;
     }
     public void OnShotFired()
@@ -115,16 +123,22 @@ public class TurnManager : MonoBehaviour
 
     private IEnumerator ResolvePhaseRoutine()
     {
-        EnemyBall[] allEnemies = FindObjectsByType<EnemyBall>(FindObjectsSortMode.None);
+        // Must include Inactive objects, because objects like BombBall disable themselves (SetActive(false)) after exploding
+        EnemyBall[] allEnemies = FindObjectsByType<EnemyBall>(FindObjectsInactive.Include, FindObjectsSortMode.None);
 
         foreach (EnemyBall enemy in allEnemies)
         {
             if (enemy != null)
             {
-                // Reset all balls back to dynamic before the next turn/spawns happen
+                // Reset all balls back to dynamic and non-trigger before the next turn/spawns happen
                 if (enemy.rb != null)
                 {
                     enemy.rb.bodyType = RigidbodyType2D.Dynamic;
+                }
+                Collider2D col = enemy.GetComponent<Collider2D>();
+                if (col != null)
+                {
+                    col.isTrigger = false;
                 }
 
                 if (enemy.hitpoints <= 0)
@@ -133,19 +147,25 @@ public class TurnManager : MonoBehaviour
                 }
             }
         }
-
+        
+        Debug.Log("Before waiting...");
         yield return new WaitForEndOfFrame(); // this is because enemies take one frame to be destroyed so we need to wait.
-
+        Debug.Log("After waiting...");
+        // When counting remaining enemies, do NOT include inactive since they were destroyed/pending GC
         EnemyBall[] remainingEnemies = FindObjectsByType<EnemyBall>(FindObjectsSortMode.None);
 
         UIManager.Instance.UpdateTurnAndEnemyCount(remainingEnemies.Length, maxEnemiesAllowed, turnCount);
-
+        
+        Debug.Log($"checking turn result");  
         if (remainingEnemies.Length > maxEnemiesAllowed)
         {
+            Debug.Log($"Before Game Over called.");
             GameManager.Instance.ChangeState(GameState.GameOver);
+            Debug.Log($"Game Over called.");
         }
         else
         {
+            Debug.Log($"Before StartTurn called.");
             StartTurn();
         }
     }

@@ -1,8 +1,7 @@
 using UnityEditor.Callbacks;
 using UnityEngine;
 
-public enum BallColor { Red, Blue, Green }
-public enum BallType { Normal, Bomb, Spike }
+
 
 
 public class EnemyBall : BaseBall
@@ -56,7 +55,7 @@ public class EnemyBall : BaseBall
     public void ApplyImpact(Vector2 sourcePosition, Vector2 contactPoint)
     {
         Vector2 dir = ((Vector2)transform.position - sourcePosition).normalized;
-        float bonusForce = 2.5f;
+        float bonusForce = 8f;
 
         rb.AddForce(dir * bonusForce, ForceMode2D.Impulse); // Push away from the source
 
@@ -77,15 +76,16 @@ public class EnemyBall : BaseBall
 
     protected virtual void OnCollisionEnter2D(Collision2D collision)
     {
+        
         // Check if we hit another enemy or the player
         EnemyBall otherEnemy = collision.gameObject.GetComponent<EnemyBall>();
+        TakeDamage(1);
 
         if (otherEnemy != null)
         {
-            // Only deduct health if colors match
+            // Only apply impact if colors match
             if (this.color == otherEnemy.color)
             {
-                TakeDamage(1);
                 ApplyImpact(otherEnemy.transform.position, collision.GetContact(0).point);
             }
         }
@@ -93,11 +93,30 @@ public class EnemyBall : BaseBall
         PlayerBall player = collision.gameObject.GetComponent<PlayerBall>();
         if (player != null)
         {
-            // Only take damage and apply impact if the player's color matches the enemy's color!
+            // Different color, player takes damage (same-color is handled by OnTriggerEnter2D now)
+            if (player.currentColor != this.color)
+            {
+                player.TakeDamage(1);
+            }
+        }
+
+        // If it gets collided with again while already having 0 health, just destroy it immediately
+        if (hitpoints <= 0)
+        {
+            Die();
+        }
+    }
+
+    protected virtual void OnTriggerEnter2D(Collider2D collider)
+    {
+        // Triggers happen when this enemy is the same color as the player and therefore set to act as a pickup
+        PlayerBall player = collider.GetComponent<PlayerBall>();
+        if (player != null)
+        {
+            // If the player's color matches the enemy's color, the player swallows the enemy and it doesn't bounce
             if (player.currentColor == this.color)
             {
-                TakeDamage(1);
-                ApplyImpact(player.transform.position, collision.GetContact(0).point);
+                player.Swallow(this);
             }
         }
     }

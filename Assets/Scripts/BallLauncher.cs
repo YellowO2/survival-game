@@ -7,43 +7,42 @@ public class BallLauncher : MonoBehaviour
     public AimConeIndicator aimConeIndicator;
     public TMPro.TextMeshPro cooldownText;
     public PlayerBall playerBall;
-    private bool isAiming = false;
+
+    void Start()
+    {
+        if (InputManager.Instance != null)
+        {
+            InputManager.Instance.OnAttackStarted += HandleAttackStarted;
+            InputManager.Instance.OnAttackEnded += HandleAttackEnded;
+        }
+    }
+
+    void OnDestroy()
+    {
+        if (InputManager.Instance != null)
+        {
+            InputManager.Instance.OnAttackStarted -= HandleAttackStarted;
+            InputManager.Instance.OnAttackEnded -= HandleAttackEnded;
+        }
+    }
+
+    private void HandleAttackStarted()
+    {
+        Debug.Log("Attack started");
+        aimConeIndicator.showAim(true);
+
+    }
+
+    private void HandleAttackEnded()
+    {
+        Debug.Log("Attack ended");
+        aimConeIndicator.showAim(false);
+        Shoot();
+    }
 
     void Shoot()
     {
-        if (TurnManager.Instance.phase != TurnPhase.PlayerAim)
-        {
-            return;
-        }
         playerBall.rb.AddForce(transform.up * playerBall.speed, ForceMode2D.Impulse);
         TurnManager.Instance.OnShotFired();
-    }
-
-    void Update()
-    {
-        if (InputManager.Instance == null)
-        {
-            return;
-        }
-
-        bool canShoot = TurnManager.Instance.phase == TurnPhase.PlayerAim;
-
-        if (!canShoot)
-        {
-            return;
-        }
-
-        bool isAttackingNow = InputManager.Instance.isAttacking;
-
-        if (isAttackingNow && !isAiming)
-        {
-            isAiming = true;
-            aimConeIndicator.showAim(true);
-        }else if (!isAttackingNow && isAiming) // indicate the moment attack button is released.
-        {
-            isAiming = false;
-            aimConeIndicator.showAim(false);
-            Shoot();
-        }
     }
 }

@@ -8,7 +8,7 @@ public class BombBall : EnemyBall
     [Header("Explosion Settings")]
     private float explosionMagnitude = 5f;
     private int explosionDamage = 3;
-    private float explosionForce = 3f;
+    private float explosionForce = 8f;
     private bool isTicking = false;
 
     public override void SetUp(int hitpoints, BallColor color, BallType type = BallType.Bomb)
