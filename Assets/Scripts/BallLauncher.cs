@@ -28,13 +28,17 @@ public class BallLauncher : MonoBehaviour
 
     private void HandleAttackStarted()
     {
-        Debug.Log("Attack started");
-        aimConeIndicator.showAim(true);
+        if (TurnManager.Instance.phase == TurnPhase.PlayerAim)
+        {
+            Debug.Log("Attack started");
+            aimConeIndicator.showAim(true);
 
+        }
     }
 
     private void HandleAttackEnded()
     {
+        if (TurnManager.Instance.phase != TurnPhase.PlayerAim) return;
         Debug.Log("Attack ended");
         aimConeIndicator.showAim(false);
         Shoot();
